@@ -10,7 +10,7 @@ module.exports = {
     // 1. CONFIGURATION DE BASE (Session & Database)
     // ===========================================================
     SESSION_ID: process.env.SESSION_ID || "MINI BOT", 
-    MONGODB_URI: process.env.MONGODB_URI || 'mongodb+srv://oshadhaoshadha12345_db_user:SH0m8ksHl8A0ZfBF@oshiya.bc9b5e4.mongodb.net/?appName=Oshiya',
+    MONGODB_URI: process.env.MONGODB_URI || 'mongodb://mongo:WaGywsWklqiOwPuGXoxlTHblrMiCitvt@mongodb.railway.internal:27017',
     
     // ===========================================================
     // 2. INFORMATIONS DU BOT
