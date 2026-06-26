@@ -9,6 +9,7 @@ const {
     jidDecode,
     downloadContentFromMessage,
     getContentType,
+    fetchLatestBaileysVersion // අලුත්ම Version එක ලබා ගැනීමට එක් කරන ලදී
 } = require('@whiskeysockets/baileys');
 const { arslanmd } = require('./lib/system');
 const config = require('./config');
@@ -224,6 +225,10 @@ async function arslanPair(number, res = null) {
 
         const arslanStore = createarslanStore();
 
+        // 📝 නවතම WhatsApp Version එක Fetch කරගැනීම
+        const { version, isLatest } = await fetchLatestBaileysVersion();
+        arslanLog(`Using WA Version: ${version.join('.')}, Is Latest: ${isLatest}`, 'info');
+
         const conn = makeWASocket({
             auth: {
                 creds: state.creds,
@@ -231,7 +236,7 @@ async function arslanPair(number, res = null) {
             },
             printQRInTerminal: false,
             logger: pino({ level: "silent" }),
-            version: [2, 3000, 1033105955],
+            version: version, // නිවැරදි කරන ලද Version එක මෙතැනට ලබා දී ඇත
             connectTimeoutMs: 60000,
             defaultQueryTimeoutMs: 0,
             keepAliveIntervalMs: 10000,
@@ -240,7 +245,7 @@ async function arslanPair(number, res = null) {
             generateHighQualityLinkPreview: true,
             syncFullHistory: true,
             markOnlineOnConnect: true,
-            browser: ['Mac OS', 'Safari', '10.15.7'],
+            browser: Browsers.macOS('Desktop'), // වඩාත් ස්ථාවර Browser configuration එකක් භාවිතය
             getMessage: async (key) => {
                 const msg = await arslanStore.loadMessage(key.remoteJid, key.id);
                 return msg && msg.message ? msg.message : { conversation: 'ARSLAN-MD' };
@@ -282,7 +287,7 @@ async function arslanPair(number, res = null) {
         if (!conn.authState.creds.registered) {
             arslanLog(`🔐 Starting NEW pairing process for ${sanitizedNumber}`, 'info');
             try {
-                await delay(1500);
+                await delay(2000); // Connection එක හරියාකාරව සකස් වීමට කුඩා Delay එකක් ලබා දීම
                 const code = await conn.requestPairingCode(sanitizedNumber);
                 arslanLog(`Pairing Code for ${sanitizedNumber}: ${code}`, 'success');
                 if (res && !res.headersSent) {
